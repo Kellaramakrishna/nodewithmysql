@@ -59,7 +59,7 @@ const addShiftTimingsData = async (req, res) => {
 
     try {
         await con.query(querySql, values);
-        res.status(200).send("Resource group data added successfully");
+        res.status(200).send("work shifts data added successfully");
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");
@@ -102,7 +102,7 @@ const getCalenderData=async(req, res) => {
 
 const getResourcesData=async(req, res) => {
     try {
-        const query = "SELECT * FROM users";
+        const query = "SELECT * FROM resource_group";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
@@ -119,7 +119,7 @@ const getResourcesData=async(req, res) => {
 
 const getWorkShiftsData=async(req, res) => {
     try {
-        const query = "SELECT * FROM users";
+        const query = "SELECT * FROM work_shifts";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
@@ -134,4 +134,37 @@ const getWorkShiftsData=async(req, res) => {
     }
 };
 
-module.exports={addUserData,addCalenderData,addResourceGroupData,addShiftTimingsData,getUserData,getCalenderData,getResourcesData,getWorkShiftsData}
+const addJunctionTableData = async (req, res) => {
+    const { userId, calenderId, resourceId, workShifId } = req.body;
+    const uuidId = uuidv4();
+    const querySql = "CALL adding_junction_table_record(?,?,?,?,?)";
+
+    const values = [uuidId, userId, calenderId, resourceId, workShifId];
+
+    try {
+        await con.query(querySql, values);
+        res.status(200).send("Junction data added successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+const getCalenderDetailsById = (req, res) => {
+    const { resourceId } = req.body;
+    const sqlQuery = "CALL get_calender_by_resource_id(?)";
+    const values = [resourceId];
+
+    con.query(sqlQuery, values, (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
+        } else {
+            res.status(200).send(result[0][0]);
+        }
+    });
+};
+
+
+
+module.exports={addUserData,addCalenderData,addResourceGroupData,addShiftTimingsData,getUserData,getCalenderData,getResourcesData,getWorkShiftsData,addJunctionTableData,getCalenderDetailsById}

@@ -6,8 +6,12 @@ router.post("/add-user",DataController.addUserData)
 router.post("/add-calender",DataController.addCalenderData)
 router.post("/add-resource-group",DataController.addResourceGroupData)
 router.post("/add-work-shift",DataController.addShiftTimingsData )
+router.post("/add-junction-data",DataController.addJunctionTableData)
+
+router.get("/get-calender-name",DataController.getCalenderDetailsById)
 router.get("/get-users",DataController.getUserData)
 router.get("/get-calender",DataController.getCalenderData)
 router.get("/get-resources",DataController.getResourcesData)
 router.get("/get-work-shifts",DataController.getWorkShiftsData)
+
 module.exports=router
