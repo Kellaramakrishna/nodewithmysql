@@ -8,7 +8,7 @@ router.post("/add-resource-group",DataController.addResourceGroupData)
 router.post("/add-work-shift",DataController.addShiftTimingsData )
 router.post("/add-junction-data",DataController.addJunctionTableData)
 
-router.get("/get-calender-name",DataController.getCalenderDetailsById)
+router.get("/get-all-data/:id",DataController.getCalenderDetailsById)
 router.get("/get-users",DataController.getUserData)
 router.get("/get-calender",DataController.getCalenderData)
 router.get("/get-resources",DataController.getResourcesData)

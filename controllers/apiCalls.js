@@ -32,20 +32,20 @@ const addCalenderData=async(req,res)=>{
 }
 
 const addResourceGroupData = async (req, res) => {
-    const { name ,calenderId,userId} = req.body;
-    const uuidId = uuidv4();
-    const querySql = "CALL adding_resource_group(?,?,?,?)";
+    const { name, calenderId, userId } = req.body;
+   
 
-    const values = [uuidId,name,calenderId,userId];
+            const id = uuidv4();
+            const querySql = "CALL adding_resource_group(?,?,?,?)";
+            const values = [id, name, calenderId, userId];
+            try {
+                await con.query(querySql, values);
+                res.status(200).send("Resource group data added successfully");
+            } catch (err) {
+                console.error(err);
+                res.status(500).send("Internal Server Error");
+            }
 
-
-    try {
-        await con.query(querySql, values);
-        res.status(200).send("Resource group data added successfully");
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
-    }
 };
 
 
@@ -135,11 +135,11 @@ const getWorkShiftsData=async(req, res) => {
 };
 
 const addJunctionTableData = async (req, res) => {
-    const { userId, calenderId, resourceId, workShifId } = req.body;
+    const { userId, calenderId, resourceId, workShiftId } = req.body;
     const uuidId = uuidv4();
     const querySql = "CALL adding_junction_table_record(?,?,?,?,?)";
 
-    const values = [uuidId, userId, calenderId, resourceId, workShifId];
+    const values = [uuidId, userId, calenderId, resourceId, workShiftId];
 
     try {
         await con.query(querySql, values);
@@ -150,17 +150,17 @@ const addJunctionTableData = async (req, res) => {
     }
 };
 
-const getCalenderDetailsById = (req, res) => {
-    const { resourceId } = req.body;
+const getCalenderDetailsById = async(req, res) => {
+    const { id } = req.params;
     const sqlQuery = "CALL get_calender_by_resource_id(?)";
-    const values = [resourceId];
+    const values = [id];
 
-    con.query(sqlQuery, values, (err, result) => {
+    await con.query(sqlQuery, values, (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).send("Internal Server Error");
         } else {
-            res.status(200).send(result[0][0]);
+            res.status(200).send(result[0]);
         }
     });
 };
