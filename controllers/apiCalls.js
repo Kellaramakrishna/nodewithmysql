@@ -3,13 +3,13 @@ const { v4: uuidv4 } = require("uuid");
 const addUserData = async (req, res) => {
     const { name, email, age } = req.body;
 
-    const querySql = "CALL adding_users(?, ?, ?, ?)";
-    const uuidId = uuidv4();
-    const values = [uuidId, name, email, age];
+    const querySql = "CALL create_user(?, ?, ?)";
+    const id = uuidv4();
+    const values = [id, name, email];
 
     try {
-        await con.query(querySql, values);
-        res.status(200).send("User added successfully");
+        const result = await con.query(querySql, values);
+        res.status(200).send({id,message:"successfull created"});
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");
@@ -17,14 +17,14 @@ const addUserData = async (req, res) => {
 };
 
 const addCalenderData=async(req,res)=>{
-    const {calenderName,financialYearStart,financialYearEnd}=req.body
-    const querySql="CALL adding_calender(?,?,?,?)"
-    const uuidId = uuidv4();
-    const values = [uuidId, calenderName,financialYearStart,financialYearEnd];
+    const {calendarName,financialYearStart,financialYearEnd}=req.body
+    const querySql="CALL create_calendar(?,?,?,?)"
+    const id = uuidv4();
+    const values = [id, calendarName,financialYearStart,financialYearEnd];
 
     try {
-        await con.query(querySql, values);
-        res.status(200).send("Calender data added successfully");
+        const result = await con.query(querySql, values);
+        res.status(200).send({id,message:"successfull created"});
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");
@@ -32,34 +32,39 @@ const addCalenderData=async(req,res)=>{
 }
 
 const addResourceGroupData = async (req, res) => {
-    const { name, calenderId, userId } = req.body;
-   
-
-            const id = uuidv4();
-            const querySql = "CALL adding_resource_group(?,?,?,?)";
-            const values = [id, name, calenderId, userId];
-            try {
-                await con.query(querySql, values);
-                res.status(200).send("Resource group data added successfully");
-            } catch (err) {
+    const { name, calendarId } = req.body;
+    const id = uuidv4();
+    const querySql = "CALL create_resource_group(?,?,?)";
+    const values = [id, name, calendarId];
+    
+    try {
+        con.query(querySql, values, (err, result) => {
+            if (err) {
                 console.error(err);
                 res.status(500).send("Internal Server Error");
+                return;
             }
-
+            // Send success response
+            res.status(200).send({id,message: "successfully created"});
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+    }
 };
 
 
 const addShiftTimingsData = async (req, res) => {
     const { name,noOfHours,startTime,endTime,resourceId} = req.body;
-    const uuidId = uuidv4();
-    const querySql = "CALL adding_work_shift(?,?,?,?,?,?)";
+    const id = uuidv4();
+    const querySql = "CALL create_work_shift(?,?,?,?,?,?)";
 
-    const values = [uuidId,name,noOfHours,startTime,endTime,resourceId];
+    const values = [id,name,noOfHours,startTime,endTime,resourceId];
 
 
     try {
         await con.query(querySql, values);
-        res.status(200).send("work shifts data added successfully");
+        res.status(200).send({id,message: "successfully created"});
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");
@@ -68,13 +73,13 @@ const addShiftTimingsData = async (req, res) => {
 
 const getUserData = async(req, res) => {
     try {
-        const query = "SELECT * FROM users";
+        const query = "CALL get_users()";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
                 res.status(500).send("Server error");
             } else {
-                res.send(result);
+                res.send(result[0]);
             }
         });
     } catch (err) {
@@ -85,7 +90,7 @@ const getUserData = async(req, res) => {
 
 const getCalenderData=async(req, res) => {
     try {
-        const query = "SELECT * FROM calender";
+        const query = "CALL get_calendar()";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
@@ -102,7 +107,7 @@ const getCalenderData=async(req, res) => {
 
 const getResourcesData=async(req, res) => {
     try {
-        const query = "SELECT * FROM resource_group";
+        const query = "CALL get_resource_group()";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
@@ -119,7 +124,7 @@ const getResourcesData=async(req, res) => {
 
 const getWorkShiftsData=async(req, res) => {
     try {
-        const query = "SELECT * FROM work_shifts";
+        const query = "CALL get_work_shift()";
        await con.query(query, (err, result) => {
             if (err) {
                 console.error(err);
@@ -135,11 +140,11 @@ const getWorkShiftsData=async(req, res) => {
 };
 
 const addJunctionTableData = async (req, res) => {
-    const { userId, calenderId, resourceId, workShiftId } = req.body;
+    const { resourceId,userId} = req.body;
     const uuidId = uuidv4();
-    const querySql = "CALL adding_junction_table_record(?,?,?,?,?)";
+    const querySql = "CALL create_resource_user_table(?,?,?)";
 
-    const values = [uuidId, userId, calenderId, resourceId, workShiftId];
+    const values = [uuidId,resourceId,userId];
 
     try {
         await con.query(querySql, values);
@@ -150,9 +155,9 @@ const addJunctionTableData = async (req, res) => {
     }
 };
 
-const getCalenderDetailsById = async(req, res) => {
-    const { id } = req.params;
-    const sqlQuery = "CALL get_calender_by_resource_id(?)";
+const getDetailsById = async(req, res) => {
+    const { id } = req.body;
+    const sqlQuery = "CALL get_resource_data_by_id(?)";
     const values = [id];
 
     await con.query(sqlQuery, values, (err, result) => {
@@ -160,11 +165,25 @@ const getCalenderDetailsById = async(req, res) => {
             console.error(err);
             res.status(500).send("Internal Server Error");
         } else {
-            res.status(200).send(result[0]);
+            const length=result[0].length
+            result.unshift({total:length})
+            res.status(200).send(result.slice(0,result.length-1));
+            
         }
     });
 };
 
 
 
-module.exports={addUserData,addCalenderData,addResourceGroupData,addShiftTimingsData,getUserData,getCalenderData,getResourcesData,getWorkShiftsData,addJunctionTableData,getCalenderDetailsById}
+module.exports=
+{addUserData,
+    addCalenderData,
+    addResourceGroupData,
+    addShiftTimingsData,
+    getUserData,
+    getCalenderData,
+    getResourcesData,
+    getWorkShiftsData,
+    addJunctionTableData,
+    getDetailsById
+}
