@@ -173,6 +173,48 @@ const getDetailsById = async(req, res) => {
     });
 };
 
+// const getDetailsById = async (req, res) => {
+//     const { id } = req.body;
+//     const sqlQuery = "CALL get_resource_data_by_id(?)";
+//     const values = [id];
+//     let final_array = [];
+
+//     await con.query(sqlQuery, values, (err, result) => {
+//         if (err) {
+//             console.error(err);
+//             res.status(500).send("Internal Server Error");
+//         } else {
+//             const data = result.slice(0, result.length - 1);
+//             const arrayList = data[0];
+            
+//             for (let eachItem of arrayList) {
+//                 let new_array = []; // Create a new array for each iteration
+//                 new_array.push({
+//                     userName: eachItem.user_name,
+//                     email: eachItem.email
+//                 });
+//                 new_array.push({
+//                     resourceGroupName: eachItem.resource_group_name
+//                 });
+//                 new_array.push({
+//                     calendarName: eachItem.calendar_name,
+//                     startYear: eachItem.start_year,
+//                     endYear: eachItem.end_year
+//                 });
+//                 new_array.push({
+//                     workShiftName: eachItem.work_shift_name,
+//                     NoOfHours: eachItem.number_of_hours,
+//                     startTime: eachItem.start_time,
+//                     endTime: eachItem.end_time
+//                 });
+            
+//                 final_array.push(new_array);
+//             }
+            
+//             res.send(final_array);
+//         }
+//     });
+// };
 
 
 module.exports=
@@ -185,5 +227,6 @@ module.exports=
     getResourcesData,
     getWorkShiftsData,
     addJunctionTableData,
-    getDetailsById
+    getDetailsById,
+
 }
